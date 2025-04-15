@@ -28,7 +28,7 @@ app.use(express.json());
 //     credentials: true
 //   }));
 
-const allowedOrigins = ["https://speedtouchadmin.vercel.app/", "https://speedtouch.onrender.com"];
+const allowedOrigins = ["https://speedtouch-admin.onrender.com", "https://speedtouch.onrender.com"];
 
 app.use(
   cors({
