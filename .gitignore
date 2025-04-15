@@ -1,0 +1,8 @@
+node_modules
+Admin/node_modules
+Backend/node_modules
+Frontend/Frontend/node_modules
+
+
+*.env
+*.log
