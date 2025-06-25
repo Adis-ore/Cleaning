@@ -16,19 +16,8 @@ connectCloudinary();
 
 // Middleware
 app.use(express.json());
-// app.use(cors(
-//     {origin: 'https://localhost:5173'}
-// ))
-// app.use(cors({
-//     origin: "http://localhost:5173", // your Admin URL
-//     credentials: true
-//   }));
-// app.use(cors({
-//     origin: "http://localhost:5174", // your frontend URL
-//     credentials: true
-//   }));
 
-const allowedOrigins = ["https://speedtouch-admin.onrender.com", "https://speedtouch.onrender.com"];
+const allowedOrigins = ["https://speedtouch-admin.vercel.app", "https://speedtouch.vercel.app"];
 
 app.use(
   cors({

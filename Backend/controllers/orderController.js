@@ -1,12 +1,11 @@
-// import { currency } from "../../Admin/src/App.jsx"; 
+// import { currency } from "../../Admin/src/App.jsx";
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 import Stripe from "stripe";
 
-
 // global variable
-const currency ='ngn'
-const deliveryCharge = 1500
+const currency = "ngn";
+const deliveryCharge = 1500;
 
 // gateway initalize
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -54,34 +53,34 @@ const placeOrderStripe = async (req, res) => {
     const newOrder = new orderModel(orderData);
     await newOrder.save();
 
-    const line_items = items.map((item)=>({
-      price_data:{
+    const line_items = items.map((item) => ({
+      price_data: {
         currency: currency,
         product_data: {
-          name:item.name
+          name: item.name,
         },
-        unit_amount: item.price * 100
+        unit_amount: item.price * 100,
       },
-      quantity: item.amount
-    }))
+      quantity: item.amount,
+    }));
     line_items.push({
-      price_data:{
+      price_data: {
         currency: currency,
         product_data: {
-          name:'Delivery Charges'
+          name: "Delivery Charges",
         },
-        unit_amount: deliveryCharge * 100
+        unit_amount: deliveryCharge * 100,
       },
-      quantity: 1
-    })
+      quantity: 1,
+    });
 
     const session = await stripe.checkout.sessions.create({
-      success_url:`${origin}/verify?success=true&orderId=${newOrder._id}`,
-      cancel_url:`${origin}/verify?success=false&orderId=${newOrder._id}`,
+      success_url: `${origin}/verify?success=true&orderId=${newOrder._id}`,
+      cancel_url: `${origin}/verify?success=false&orderId=${newOrder._id}`,
       line_items,
-      mode: 'payment'
-    })
-    res.json({success:true, session_url:session.url})
+      mode: "payment",
+    });
+    res.json({ success: true, session_url: session.url });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
@@ -89,27 +88,90 @@ const placeOrderStripe = async (req, res) => {
 };
 // verify stripe payment
 
-const verifyStripe = async(req,res) => {
-  const {orderId, success, userId} = req.body
+const verifyStripe = async (req, res) => {
+  const { orderId, success, userId } = req.body;
   try {
-    if (success === 'true') {
-      await   orderModel.findByIdAndUpdate(orderId,{payment:true})
-      await userModel.findByIdAndUpdate(userId,{cardData: {}})
-      res.json({success:true})
-    } else{
-      await orderModel.findByIdAndDelete(orderId)
-      res.json({success:false})
+    if (success === "true") {
+      await orderModel.findByIdAndUpdate(orderId, { payment: true });
+      await userModel.findByIdAndUpdate(userId, { cardData: {} });
+      res.json({ success: true });
+    } else {
+      await orderModel.findByIdAndDelete(orderId);
+      res.json({ success: false });
     }
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
   }
-}
-
-
+};
 
 // ---------placing orders using remita method ------------
-const placeOrderRemita = async (req, res) => {};
+const placeOrderRemita = async (req, res) => {
+  try {
+    const { userId, items, amount, address } = req.body;
+    const { origin } = req.headers;
+
+    const orderData = {
+      userId,
+      items,
+      amount,
+      address,
+      paymentMethod: "remita",
+      payment: false,
+      date: Date.now(),
+    };
+
+    const newOrder = new orderModel(orderData);
+    await newOrder.save();
+
+    const line_items = items.map((item) => ({
+      price_data: {
+        currency: currency,
+        product_data: {
+          name: item.name,
+        },
+        unit_amount: item.price * 100,
+      },
+      quantity: item.amount,
+    }));
+    line_items.push({
+      price_data: {
+        currency: currency,
+        product_data: {
+          name: "Delivery charges",
+        },
+        unit_amount: deliveryCharge * 100,
+      },
+      quantity: 1,
+    });
+
+    const session = await remita.checkout.session.create({
+      success_url: `${origin}/verify?success=true&orderId=${newOrder._id}`,
+      cancel_url: `${origin}/verify?false=true&orderId=${newOrder._id}`,
+      line_items,
+      mode: "payment",
+    });
+
+    res.json({ success: true, session_url: session.url });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+// Verify Remita Payment
+const verifyRemita = async (req, res) => {
+  const { orderId, success, userId } = req.body;
+  try {
+    if (success === "true") {
+      await orderModel.findByIdAndUpdate(orderId, { payment: true });
+      await userModel.findByIdAndUpdate(userId, { cartData: {} });
+      res.json({ success: true });
+    }
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
 
 // All orders data on Admin panel
 const allOrders = async (req, res) => {
