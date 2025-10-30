@@ -10,5 +10,4 @@ createRoot(document.getElementById('root')).render(
     <ShopcontextProvider>
        <App />
     </ShopcontextProvider>
-  </BrowserRouter>,
-)
+  </BrowserRouter>,)
