@@ -17,7 +17,7 @@ connectCloudinary();
 // Middleware
 app.use(express.json());
 
-const allowedOrigins = ["https://speedtouch-admin.vercel.app", "https://speedtouch.vercel.app", "http://localhost:5174  "];
+const allowedOrigins = ["https://speedtouch-admin.vercel.app", "https://speedtouch.vercel.app", "http://localhost:5175  "];
 
 app.use(
   cors({
