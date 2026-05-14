@@ -379,6 +379,12 @@ const VideoCard = ({ videoId, title }) => {
 const Services = () => {
   const [selected, setSelected] = useState(null);
   const [proofTab, setProofTab] = useState('gallery');
+  const [mobileMoreOpen, setMobileMoreOpen] = useState(null);
+
+  const handleSelect = (id) => {
+    if (selected !== id) setMobileMoreOpen(null);
+    setSelected(selected === id ? null : id);
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -422,7 +428,7 @@ const Services = () => {
               {/* Card Header */}
               <button
                 className="w-full flex items-center gap-5 p-6 sm:p-7 text-left bg-white hover:bg-[#f9feff] transition-colors"
-                onClick={() => setSelected(selected === service.id ? null : service.id)}
+                onClick={() => handleSelect(service.id)}
               >
                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all ${selected === service.id ? 'bg-gradient-to-br from-[#159be3] to-[#0e7ab8] shadow-lg shadow-[#159be3]/30' : 'bg-[#159be3]/10'}`}>
                   <service.icon className={`w-7 h-7 transition-colors ${selected === service.id ? 'text-white' : 'text-[#159be3]'}`} />
@@ -448,7 +454,81 @@ const Services = () => {
               {/* Expanded Content */}
               {selected === service.id && (
                 <div className="border-t-2 border-[#159be3]/10 bg-white">
-                  <div className="p-6 sm:p-8">
+
+                  {/* ── Mobile layout: gallery first, then See More ── */}
+                  <div className="block lg:hidden p-4 sm:p-6">
+                    {/* Gallery */}
+                    {proofTab === 'gallery' && (
+                      <ProjectGallery projects={service.projects} title={service.title} />
+                    )}
+                    {proofTab === 'video' && service.videoId && (
+                      <VideoCard videoId={service.videoId} title={service.title} />
+                    )}
+
+                    {/* Tab switcher (if video exists) */}
+                    {service.videoId && (
+                      <div className="flex gap-2 mt-3 mb-1">
+                        <button
+                          onClick={() => setProofTab('gallery')}
+                          className={`flex items-center gap-1.5 px-3 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${
+                            proofTab === 'gallery' ? 'bg-[#159be3] text-white' : 'bg-[#f0f9ff] text-[#159be3] border border-[#159be3]/20'
+                          }`}
+                        >
+                          <BsImages className="w-3 h-3" />
+                          Before/After
+                        </button>
+                        <button
+                          onClick={() => setProofTab('video')}
+                          className={`flex items-center gap-1.5 px-3 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${
+                            proofTab === 'video' ? 'bg-[#159be3] text-white' : 'bg-[#f0f9ff] text-[#159be3] border border-[#159be3]/20'
+                          }`}
+                        >
+                          <BsCameraVideo className="w-3 h-3" />
+                          Video
+                        </button>
+                      </div>
+                    )}
+
+                    {/* See More toggle */}
+                    <button
+                      onClick={() => setMobileMoreOpen(mobileMoreOpen === service.id ? null : service.id)}
+                      className="w-full mt-4 flex items-center justify-center gap-2 py-3 rounded-2xl border-2 border-[#159be3]/30 text-[#159be3] font-black text-xs uppercase tracking-widest hover:bg-[#f0f9ff] transition-all"
+                    >
+                      {mobileMoreOpen === service.id ? 'See Less' : "What's Included"}
+                      <span className={`transition-transform inline-block ${mobileMoreOpen === service.id ? 'rotate-180' : ''}`}>↓</span>
+                    </button>
+
+                    {/* Expandable: description + includes + CTA */}
+                    {mobileMoreOpen === service.id && (
+                      <div className="mt-4 space-y-4">
+                        <p className="text-gray-500 text-sm leading-relaxed" style={{ fontFamily: 'Poppins, sans-serif' }}>{service.fullDesc}</p>
+                        <h4 className="font-black text-[#0d1b2a] text-xs uppercase tracking-widest flex items-center gap-2" style={{ fontFamily: 'Oswald, sans-serif' }}>
+                          <div className="w-4 h-[2px] bg-[#159be3]" />
+                          What's Included
+                        </h4>
+                        <ul className="grid grid-cols-1 gap-2">
+                          {service.includes.map((item) => (
+                            <li key={item} className="flex items-center gap-2.5 text-sm text-gray-600 font-semibold">
+                              <div className="w-5 h-5 rounded-full bg-[#159be3]/10 flex items-center justify-center flex-shrink-0">
+                                <BsCheck2 className="w-3 h-3 text-[#159be3]" />
+                              </div>
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                        <Link
+                          to="/contact"
+                          className="inline-flex items-center gap-3 px-6 py-3.5 bg-gradient-to-r from-[#159be3] to-[#0e7ab8] text-white font-black text-xs uppercase tracking-widest rounded-2xl hover:shadow-xl hover:shadow-[#159be3]/30 transition-all group"
+                        >
+                          Book This Service
+                          <BsArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* ── Desktop layout: two-column side-by-side ── */}
+                  <div className="hidden lg:block p-8">
                     <div className="grid lg:grid-cols-2 gap-10">
 
                       {/* Left — description + includes */}
@@ -522,6 +602,7 @@ const Services = () => {
                       </div>
                     </div>
                   </div>
+
                 </div>
               )}
             </div>

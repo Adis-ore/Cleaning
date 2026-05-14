@@ -4,16 +4,18 @@ import {
   listProduct,
   removeProduct,
   singleProduct,
+  updateProduct,
 } from "../controllers/productController.js";
-import upload from "../middleware/multer.js";
+import upload    from "../middleware/multer.js";
 import adminAuth from "../middleware/adminAuth.js";
 
 const productRouter = express.Router();
 
-// Log when router loads
-console.log("PRODUCT ROUTER LOADED");
+// Public
+productRouter.get("/list",   listProduct);
+productRouter.get("/single", singleProduct);
 
-// Add Product (with file upload)
+// Admin — add with image upload
 productRouter.post(
   "/add",
   adminAuth,
@@ -31,16 +33,8 @@ productRouter.post(
   addProduct
 );
 
-// List Products
-productRouter.get("/list", (req, res) => {
-  console.log("GET /list called");
-  listProduct(req, res);
-});
-
-// Delete Product
+// Admin — remove & update
 productRouter.delete("/remove", adminAuth, removeProduct);
-
-// Single Product Info
-productRouter.get("/single", singleProduct);
+productRouter.patch("/update",  adminAuth, updateProduct);
 
 export default productRouter;

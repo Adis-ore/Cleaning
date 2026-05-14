@@ -15,6 +15,7 @@ import Footer from './components/Footer'
 import SearchBar from './components/SearchBar'
 import ScrollToTop from './components/ScrollToTop'
 import NewsTicker from './components/NewsTicker'
+import CookieConsent from './components/CookieConsent'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Verify from './pages/Verify'
@@ -41,6 +42,7 @@ const App = () => {
         <Route path='/verify' element={<Verify />} />
       </Routes>
       <Footer />
+      <CookieConsent />
     </div>
   )
 }

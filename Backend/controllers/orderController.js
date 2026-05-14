@@ -1,220 +1,184 @@
-// import { currency } from "../../Admin/src/App.jsx";
 import orderModel from "../models/orderModel.js";
-import userModel from "../models/userModel.js";
-import Stripe from "stripe";
+import userModel  from "../models/userModel.js";
 
-// global variable
-const currency = "ngn";
-const deliveryCharge = 1500;
+const DELIVERY_CHARGE = 1500;
 
-// gateway initalize
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+// ─── Helper ─────────────────────────────────────────────────────────────────
+const clearCart = (userId) =>
+  userModel.findByIdAndUpdate(userId, { cartData: {} });
 
-// ---------placing orders using COD method ------------
+// ─── POST /api/order/place  (Cash on Delivery) ──────────────────────────────
 const placeOrder = async (req, res) => {
   try {
     const { userId, items, amount, address } = req.body;
 
-    const orderData = {
+    if (!userId || !items?.length || !amount || !address) {
+      return res.status(400).json({ success: false, message: "Missing order details." });
+    }
+
+    const order = new orderModel({
       userId,
       items,
       amount,
       address,
       paymentMethod: "COD",
-      payment: false,
-      date: Date.now(),
-    };
+      payment:       false,
+      date:          Date.now(),
+    });
 
-    const newOrder = new orderModel(orderData);
-    await newOrder.save();
+    await order.save();
+    await clearCart(userId);
 
-    await userModel.findByIdAndUpdate(userId, { cartData: {} });
-
-    res.json({ success: true, message: "Order placed" });
+    res.status(201).json({ success: true, message: "Order placed successfully." });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
+    console.error("placeOrder:", error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
-// ---------placing orders using stripe  method ------------
-const placeOrderStripe = async (req, res) => {
+
+// ─── POST /api/order/paystack  (Paystack — initialize) ──────────────────────
+// This creates the order and returns a Paystack payment URL.
+// Requires PAYSTACK_SECRET_KEY in .env once you get the Paystack API key.
+const placeOrderPaystack = async (req, res) => {
   try {
-    const { userId, items, amount, address } = req.body;
-    const { origin } = req.headers;
-    const orderData = {
+    const { userId, items, amount, address, email } = req.body;
+
+    if (!userId || !items?.length || !amount || !address || !email) {
+      return res.status(400).json({ success: false, message: "Missing order details." });
+    }
+
+    const order = new orderModel({
       userId,
       items,
-      amount,
+      amount: amount + DELIVERY_CHARGE,
       address,
-      paymentMethod: "Stripe",
-      payment: false,
-      date: Date.now(),
-    };
-    const newOrder = new orderModel(orderData);
-    await newOrder.save();
-
-    const line_items = items.map((item) => ({
-      price_data: {
-        currency: currency,
-        product_data: {
-          name: item.name,
-        },
-        unit_amount: item.price * 100,
-      },
-      quantity: item.amount,
-    }));
-    line_items.push({
-      price_data: {
-        currency: currency,
-        product_data: {
-          name: "Delivery Charges",
-        },
-        unit_amount: deliveryCharge * 100,
-      },
-      quantity: 1,
+      paymentMethod: "Paystack",
+      payment:       false,
+      date:          Date.now(),
     });
 
-    const session = await stripe.checkout.sessions.create({
-      success_url: `${origin}/verify?success=true&orderId=${newOrder._id}`,
-      cancel_url: `${origin}/verify?success=false&orderId=${newOrder._id}`,
-      line_items,
-      mode: "payment",
+    await order.save();
+
+    // ── Paystack initialise transaction ──────────────────────────────────────
+    // Uncomment and install 'paystack-node' or use axios when key is available.
+    //
+    // const response = await axios.post(
+    //   "https://api.paystack.co/transaction/initialize",
+    //   {
+    //     email,
+    //     amount:    (amount + DELIVERY_CHARGE) * 100,   // Paystack expects kobo
+    //     reference: order._id.toString(),
+    //     callback_url: `${req.headers.origin}/verify?orderId=${order._id}`,
+    //     metadata: { orderId: order._id.toString(), userId },
+    //   },
+    //   {
+    //     headers: {
+    //       Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+    //       "Content-Type": "application/json",
+    //     },
+    //   }
+    // );
+    //
+    // const { authorization_url, reference } = response.data.data;
+    // await orderModel.findByIdAndUpdate(order._id, { paystackRef: reference });
+    // return res.json({ success: true, payment_url: authorization_url });
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // Placeholder response until Paystack key is configured
+    res.json({
+      success:  true,
+      orderId:  order._id,
+      message:  "Order saved. Paystack key not yet configured.",
     });
-    res.json({ success: true, session_url: session.url });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
+    console.error("placeOrderPaystack:", error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
-// verify stripe payment
 
-const verifyStripe = async (req, res) => {
-  const { orderId, success, userId } = req.body;
+// ─── POST /api/order/verifyPaystack  (Paystack — webhook / callback) ─────────
+const verifyPaystack = async (req, res) => {
   try {
-    if (success === "true") {
-      await orderModel.findByIdAndUpdate(orderId, { payment: true });
-      await userModel.findByIdAndUpdate(userId, { cardData: {} });
-      res.json({ success: true });
-    } else {
-      await orderModel.findByIdAndDelete(orderId);
-      res.json({ success: false });
+    const { orderId, reference } = req.body;
+
+    if (!orderId) {
+      return res.status(400).json({ success: false, message: "Order ID required." });
     }
+
+    // ── Verify with Paystack API ──────────────────────────────────────────────
+    // Uncomment when PAYSTACK_SECRET_KEY is available:
+    //
+    // const response = await axios.get(
+    //   `https://api.paystack.co/transaction/verify/${reference}`,
+    //   { headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}` } }
+    // );
+    //
+    // if (response.data.data.status === "success") {
+    //   await orderModel.findByIdAndUpdate(orderId, { payment: true });
+    //   await clearCart(response.data.data.metadata.userId);
+    //   return res.json({ success: true, message: "Payment verified." });
+    // }
+    //
+    // return res.json({ success: false, message: "Payment not completed." });
+    // ─────────────────────────────────────────────────────────────────────────
+
+    res.json({ success: false, message: "Paystack key not yet configured." });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
+    console.error("verifyPaystack:", error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// ---------placing orders using remita method ------------
-const placeOrderRemita = async (req, res) => {
+// ─── POST /api/order/list  (admin — all orders) ──────────────────────────────
+const allOrders = async (_req, res) => {
   try {
-    const { userId, items, amount, address } = req.body;
-    const { origin } = req.headers;
-
-    const orderData = {
-      userId,
-      items,
-      amount,
-      address,
-      paymentMethod: "remita",
-      payment: false,
-      date: Date.now(),
-    };
-
-    const newOrder = new orderModel(orderData);
-    await newOrder.save();
-
-    const line_items = items.map((item) => ({
-      price_data: {
-        currency: currency,
-        product_data: {
-          name: item.name,
-        },
-        unit_amount: item.price * 100,
-      },
-      quantity: item.amount,
-    }));
-    line_items.push({
-      price_data: {
-        currency: currency,
-        product_data: {
-          name: "Delivery charges",
-        },
-        unit_amount: deliveryCharge * 100,
-      },
-      quantity: 1,
-    });
-
-    const session = await remita.checkout.session.create({
-      success_url: `${origin}/verify?success=true&orderId=${newOrder._id}`,
-      cancel_url: `${origin}/verify?false=true&orderId=${newOrder._id}`,
-      line_items,
-      mode: "payment",
-    });
-
-    res.json({ success: true, session_url: session.url });
-  } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
-  }
-};
-// Verify Remita Payment
-const verifyRemita = async (req, res) => {
-  const { orderId, success, userId } = req.body;
-  try {
-    if (success === "true") {
-      await orderModel.findByIdAndUpdate(orderId, { payment: true });
-      await userModel.findByIdAndUpdate(userId, { cartData: {} });
-      res.json({ success: true });
-    }
-  } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
-  }
-};
-
-// All orders data on Admin panel
-const allOrders = async (req, res) => {
-  try {
-    const orders = await orderModel.find({});
+    const orders = await orderModel.find({}).sort({ date: -1 });
     res.json({ success: true, orders });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
+    console.error("allOrders:", error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// user order Data for frontend
+// ─── POST /api/order/userorders  (user — own orders) ─────────────────────────
 const userOrders = async (req, res) => {
   try {
     const { userId } = req.body;
-
-    const orders = await orderModel.find({ userId });
+    const orders = await orderModel.find({ userId }).sort({ date: -1 });
     res.json({ success: true, orders });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
+    console.error("userOrders:", error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// update order status from Admin Panel
+// ─── POST /api/order/status  (admin — update status) ─────────────────────────
 const updateStatus = async (req, res) => {
   try {
     const { orderId, status } = req.body;
-    await orderModel.findByIdAndUpdate(orderId, { status });
-    res.json({ success: true, message: "Status Updated" });
+
+    const validStatuses = ["Order Placed", "Packing", "Shipped", "Out for delivery", "Delivered"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ success: false, message: "Invalid status value." });
+    }
+
+    const order = await orderModel.findByIdAndUpdate(orderId, { status }, { new: true });
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found." });
+    }
+
+    res.json({ success: true, message: "Order status updated." });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
+    console.error("updateStatus:", error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
 export {
   placeOrder,
-  placeOrderStripe,
-  placeOrderRemita,
+  placeOrderPaystack,
+  verifyPaystack,
   allOrders,
   userOrders,
   updateStatus,
-  verifyStripe,
 };

@@ -84,12 +84,12 @@ const ServicesSection = () => {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
           {services.map(({ icon: Icon, title, desc, bg, shadow }, i) => (
             <Link
               key={i}
               to="/services"
-              className="group relative overflow-hidden rounded-3xl p-7 flex flex-col gap-5 transition-all duration-300 hover:-translate-y-1"
+              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 sm:p-7 flex flex-col gap-3 sm:gap-5 transition-all duration-300 hover:-translate-y-1"
               style={{
                 background: '#ffffff',
                 border: '1px solid rgba(21,155,227,0.15)',
@@ -97,35 +97,35 @@ const ServicesSection = () => {
               }}
             >
               {/* Top color strip */}
-              <div className="absolute top-0 left-0 right-0 h-1 rounded-t-3xl" style={{ background: bg }} />
+              <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl sm:rounded-t-3xl" style={{ background: bg }} />
 
               {/* Icon */}
               <div
-                className="w-14 h-14 rounded-2xl flex items-center justify-center"
-                style={{
-                  background: bg,
-                  boxShadow: `0 8px 24px ${shadow}`,
-                }}
+                className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center"
+                style={{ background: bg, boxShadow: `0 8px 24px ${shadow}` }}
               >
-                <Icon className="w-7 h-7 text-white" />
+                <Icon className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
               </div>
 
               <div>
-                <h3 className="font-black text-base uppercase mb-2" style={{ fontFamily: 'Oswald, sans-serif', color: '#0d1b2a' }}>
+                <h3 className="font-black text-xs sm:text-base uppercase mb-1 sm:mb-2 leading-tight" style={{ fontFamily: 'Oswald, sans-serif', color: '#0d1b2a' }}>
                   {title}
                 </h3>
-                <p className="text-sm leading-relaxed" style={{ fontFamily: 'Poppins, sans-serif', color: '#6b7280' }}>
+                <p className="text-[10px] sm:text-sm leading-relaxed hidden sm:block" style={{ fontFamily: 'Poppins, sans-serif', color: '#6b7280' }}>
+                  {desc}
+                </p>
+                <p className="text-[10px] leading-snug sm:hidden line-clamp-2" style={{ fontFamily: 'Poppins, sans-serif', color: '#6b7280' }}>
                   {desc}
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider mt-auto transition-all group-hover:gap-4" style={{ color: '#159be3', fontFamily: 'Poppins, sans-serif' }}>
-                Learn More <BsArrowRight className="w-3 h-3" />
+              <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-semibold uppercase tracking-wider mt-auto transition-all group-hover:gap-3" style={{ color: '#159be3', fontFamily: 'Poppins, sans-serif' }}>
+                Learn More <BsArrowRight className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
               </div>
 
               {/* Hover overlay */}
               <div
-                className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                className="absolute inset-0 rounded-2xl sm:rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                 style={{ background: 'linear-gradient(135deg, rgba(21,155,227,0.04), rgba(13,27,42,0.04))' }}
               />
             </Link>

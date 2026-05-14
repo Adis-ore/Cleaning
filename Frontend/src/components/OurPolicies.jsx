@@ -63,11 +63,11 @@ const OurPolicies = () => {
         </div>
 
         {/* Policy Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-3 gap-2 sm:gap-6">
           {policies.map(({ icon: Icon, title, desc, stat, statLabel, iconBg, accent }, i) => (
             <div
               key={i}
-              className="relative overflow-hidden rounded-3xl p-8 transition-all duration-500 hover:-translate-y-2"
+              className="relative overflow-hidden rounded-2xl sm:rounded-3xl p-3 sm:p-8 transition-all duration-500 hover:-translate-y-2"
               style={{
                 background: 'linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)',
                 border: `1px solid rgba(255,255,255,0.12)`,
@@ -75,21 +75,21 @@ const OurPolicies = () => {
               }}
             >
               {/* Top accent bar */}
-              <div className="absolute top-0 left-0 right-0 h-1 rounded-t-3xl" style={{ background: `linear-gradient(90deg, ${iconBg}, transparent)` }} />
+              <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl sm:rounded-t-3xl" style={{ background: `linear-gradient(90deg, ${iconBg}, transparent)` }} />
 
-              {/* Icon + Stat row */}
-              <div className="flex items-start justify-between mb-6">
-                <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: `linear-gradient(135deg, ${iconBg}, ${iconBg}cc)` }}>
-                  <Icon className="w-8 h-8 text-white" />
+              {/* Icon + Stat — stacked on mobile, row on desktop */}
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-0 mb-3 sm:mb-6">
+                <div className="w-9 h-9 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg" style={{ background: `linear-gradient(135deg, ${iconBg}, ${iconBg}cc)` }}>
+                  <Icon className="w-5 h-5 sm:w-8 sm:h-8 text-white" />
                 </div>
-                <div className="text-right">
-                  <p className="text-4xl font-black" style={{ fontFamily: 'Oswald, sans-serif', color: accent }}>{stat}</p>
-                  <p className="text-xs font-bold uppercase tracking-wider mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>{statLabel}</p>
+                <div className="sm:text-right">
+                  <p className="text-lg sm:text-4xl font-black leading-none" style={{ fontFamily: 'Oswald, sans-serif', color: accent }}>{stat}</p>
+                  <p className="text-[8px] sm:text-xs font-bold uppercase tracking-wider mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>{statLabel}</p>
                 </div>
               </div>
 
-              <h3 className="font-black text-white text-lg uppercase mb-3" style={{ fontFamily: 'Oswald, sans-serif' }}>{title}</h3>
-              <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)', fontFamily: 'Poppins, sans-serif' }}>{desc}</p>
+              <h3 className="font-black text-white text-[10px] sm:text-lg uppercase mb-1 sm:mb-3 leading-tight" style={{ fontFamily: 'Oswald, sans-serif' }}>{title}</h3>
+              <p className="text-[9px] sm:text-sm leading-relaxed hidden sm:block" style={{ color: 'rgba(255,255,255,0.55)', fontFamily: 'Poppins, sans-serif' }}>{desc}</p>
             </div>
           ))}
         </div>

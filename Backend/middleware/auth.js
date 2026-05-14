@@ -1,20 +1,17 @@
-import jtw from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
-const authUser = async (req, res, next) => {
+const authUser = (req, res, next) => {
   const { token } = req.headers;
-
   if (!token) {
-    return res.json({ success: false, message: "Not Authorised login again" });
+    return res.status(401).json({ success: false, message: "Not authorised. Please log in." });
   }
   try {
-    const token_decode = jtw.verify(token, process.env.JWT_SECRET);
-    req.body.userId = token_decode.id;
-    next()
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.body.userId = decoded.id;
+    next();
   } catch (error) {
-    console.log(error);
-    res.json({success:false, message: error.message})
+    res.status(401).json({ success: false, message: "Session expired. Please log in again." });
   }
 };
 
-
-export default authUser
+export default authUser;

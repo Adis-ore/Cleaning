@@ -14,12 +14,13 @@ const Productitem = ({ id, name, price, image, category, bestseller }) => {
       onClick={() => navigate(`/product/${id}`)}
       style={{
         background: '#ffffff',
-        borderRadius: '20px',
+        borderRadius: '16px',
         overflow: 'hidden',
         border: '1px solid #f1f5f9',
         boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
         transition: 'all 0.3s ease',
-        display: 'flex', flexDirection: 'column',
+        display: 'flex',
+        flexDirection: 'column',
         cursor: 'pointer',
       }}
     >
@@ -32,28 +33,29 @@ const Productitem = ({ id, name, price, image, category, bestseller }) => {
         />
 
         {/* Badges */}
-        <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        <div style={{ position: 'absolute', top: '6px', left: '6px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {bestseller && (
-            <span style={{ background: '#f6e5b7', color: '#7a5c00', fontSize: '10px', fontWeight: 700, padding: '3px 8px', borderRadius: '20px', fontFamily: 'Poppins, sans-serif' }}>
+            <span className="text-[8px] sm:text-[10px]" style={{ background: '#f6e5b7', color: '#7a5c00', fontWeight: 700, padding: '2px 6px', borderRadius: '20px', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>
               Top Seller
-            </span>
-          )}
-          {category && (
-            <span style={{ background: '#ffffff', color: '#159be3', fontSize: '10px', fontWeight: 700, padding: '3px 8px', borderRadius: '20px', fontFamily: 'Poppins, sans-serif', textTransform: 'capitalize' }}>
-              {category}
             </span>
           )}
         </div>
       </div>
 
       {/* Info */}
-      <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <h3 className="line-clamp-2" style={{ fontFamily: 'Poppins, sans-serif', fontSize: '13px', fontWeight: 600, color: '#0d1b2a', lineHeight: 1.4 }}>
+      <div className="p-2 sm:p-3" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <h3
+          className="line-clamp-2 text-[10px] sm:text-[13px]"
+          style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, color: '#0d1b2a', lineHeight: 1.35 }}
+        >
           {name}
         </h3>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '2px', marginTop: 'auto' }}>
-          <TbCurrencyNaira style={{ width: '16px', height: '16px', color: '#159be3', flexShrink: 0 }} />
-          <span style={{ fontFamily: 'Oswald, sans-serif', fontSize: '20px', fontWeight: 700, color: '#159be3' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1px', marginTop: 'auto' }}>
+          <TbCurrencyNaira className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" style={{ color: '#159be3' }} />
+          <span
+            className="text-sm sm:text-xl"
+            style={{ fontFamily: 'Oswald, sans-serif', fontWeight: 700, color: '#159be3', lineHeight: 1 }}
+          >
             {price.toLocaleString()}
           </span>
         </div>
@@ -62,29 +64,22 @@ const Productitem = ({ id, name, price, image, category, bestseller }) => {
       {/* Add to Cart */}
       <button
         onClick={(e) => { e.stopPropagation(); addToCart(id); }}
+        className="hover:bg-[#0e7ab8] active:scale-95 mx-1.5 sm:mx-3 mb-1.5 sm:mb-3 p-2 sm:p-3 flex items-center justify-center gap-1.5 sm:gap-2 rounded-xl sm:rounded-xl"
         style={{
-          margin: '0 12px 12px',
-          padding: '12px',
           background: '#159be3',
           color: '#ffffff',
-          borderRadius: '12px',
           fontFamily: 'Poppins, sans-serif',
-          fontSize: '12px',
+          fontSize: '11px',
           fontWeight: 700,
           textTransform: 'uppercase',
-          letterSpacing: '0.1em',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '8px',
+          letterSpacing: '0.08em',
           border: 'none',
           cursor: 'pointer',
           transition: 'background 0.2s',
         }}
-        className="hover:bg-[#0e7ab8] active:scale-95"
       >
-        <BsCart3 className="w-4 h-4" />
-        Add to Cart
+        <BsCart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+        <span className="hidden sm:inline">Add to Cart</span>
       </button>
     </div>
   );
