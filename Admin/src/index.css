@@ -1,12 +1,53 @@
 @import "tailwindcss";
 
-select,input,textarea{
-    border-radius: 4px;
-    border: 1px solid #c2c2c2;
-    outline-color: #c586A5;
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-.active{
-    background-color: #ffebf5;
-    border-color: #c586A5;
+@layer base {
+  :root {
+    --font-heading: 'Oswald', sans-serif;
+    --font-body: 'Poppins', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    background: #f8fafc;
+    color: #1a1a2e;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: #f1f5f9; }
+  ::-webkit-scrollbar-thumb { background: #159be3; border-radius: 3px; }
+
+  input, select, textarea {
+    font-family: var(--font-body);
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+    -webkit-text-fill-color: #1a1a2e;
+  }
+}
+
+@layer utilities {
+  .animate-fadeUp { animation: fadeUp 0.5s ease both; }
+  .animate-fadeIn { animation: fadeIn 0.4s ease both; }
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 }

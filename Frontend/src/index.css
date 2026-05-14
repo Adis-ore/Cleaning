@@ -1,39 +1,95 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Oswald:wght@200..700&display=swap');
 @import "tailwindcss";
 
-/* this is the hr underline to make on the active component underline */
-a.active hr{
-    display: block;
+/* Keyframes are global — not subject to the layer cascade */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(32px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(21,155,227,0.4); }
+  50%       { box-shadow: 0 0 0 12px rgba(21,155,227,0); }
+}
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
-*{
-    font-family:oswald-uniquifier ;
+@layer base {
+  :root {
+    --font-heading: 'Oswald', sans-serif;
+    --font-body: 'Poppins', sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background: #ffffff;
+    color: #1A1A2E;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-heading {
+    font-family: var(--font-heading);
+  }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #f1f5f9; }
+  ::-webkit-scrollbar-thumb { background: #159be3; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #0e7ab8; }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+    -webkit-text-fill-color: #1A1A2E;
+    transition: background-color 5000s ease-in-out 0s;
+  }
 }
 
-.oswald-uniquifier {
-    font-family: "Oswald", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: weight;
-    font-style: normal;
-  }
-  .custom-icon {
-    width: 50px;
-    height: 50px;
-    /* color: red; */
-  }
-  /* body{
-    background-color: blue;
-  } */
-  
-  
-  ::-webkit-scrollbar{
-    display: none;
+@layer utilities {
+  .animate-fadeUp        { animation: fadeUp 0.6s ease both; }
+  .animate-fadeIn        { animation: fadeIn 0.5s ease both; }
+  .animate-slideInRight  { animation: slideInRight 0.5s ease both; }
+  .delay-100 { animation-delay: 0.1s; }
+  .delay-200 { animation-delay: 0.2s; }
+  .delay-300 { animation-delay: 0.3s; }
+  .delay-500 { animation-delay: 0.5s; }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
-  @media (max-width:640px) {
-    a.active{
-        background-color: black;
-        color: white;
-    }
-    
+  .bg-brand-gradient    { background: linear-gradient(135deg, #159be3 0%, #0d7fbf 100%); }
+  .bg-light-gradient    { background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); }
+  .bg-gold-gradient     { background: linear-gradient(135deg, #f6e5b7 0%, #e8c96a 100%); }
+
+  .text-gradient-blue {
+    background: linear-gradient(135deg, #159be3, #0d7fbf);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
+  .text-gradient-gold {
+    background: linear-gradient(135deg, #f6e5b7, #c9a227);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}

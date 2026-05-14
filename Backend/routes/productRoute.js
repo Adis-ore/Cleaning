@@ -10,7 +10,10 @@ import adminAuth from "../middleware/adminAuth.js";
 
 const productRouter = express.Router();
 
-// Add error handling for file uploads
+// Log when router loads
+console.log("PRODUCT ROUTER LOADED");
+
+// Add Product (with file upload)
 productRouter.post(
   "/add",
   adminAuth,
@@ -21,19 +24,23 @@ productRouter.post(
       { name: "image3", maxCount: 1 },
       { name: "image4", maxCount: 1 },
     ])(req, res, (err) => {
-      if (err) {
-        return res.status(400).json({ success: false, message: err.message });
-      }
+      if (err) return res.status(400).json({ success: false, message: err.message });
       next();
     });
   },
   addProduct
 );
-productRouter.get("/list", listProduct);
 
-// Update `/remove` route to use DELETE for consistency
+// List Products
+productRouter.get("/list", (req, res) => {
+  console.log("GET /list called");
+  listProduct(req, res);
+});
+
+// Delete Product
 productRouter.delete("/remove", adminAuth, removeProduct);
 
+// Single Product Info
 productRouter.get("/single", singleProduct);
 
 export default productRouter;

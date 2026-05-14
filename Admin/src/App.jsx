@@ -1,4 +1,4 @@
-import { TbCurrencyNaira } from "react-icons/tb"; 
+import { TbCurrencyNaira } from "react-icons/tb";
 import React, { useEffect, useState } from "react";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
@@ -8,42 +8,49 @@ import List from "./pages/List";
 import Orders from "./pages/Orders";
 import Login from "./components/Login";
 import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { dummyProducts, dummyOrders } from "./dummyData";
 
-// ----- GETTING BACKEND URL FROM ENV FILE -----
-export const backendUrl = import.meta.env.VITE_BACKEND_URL;
-export const currency =<TbCurrencyNaira />
+export const currency = <TbCurrencyNaira style={{ display: 'inline', verticalAlign: 'middle' }} />;
+
+const ADMIN_EMAIL    = 'admin@speedtouch.com';
+const ADMIN_PASSWORD = 'admin123';
 
 const App = () => {
   const [token, setToken] = useState(
-    localStorage.getItem("token") ? localStorage.getItem("token") : ""
+    localStorage.getItem("adminToken") || ""
   );
+  const [products, setProducts] = useState(dummyProducts);
+  const [orders,   setOrders]   = useState(dummyOrders);
 
-  // ------- STORING TOKEN IN LOCAL STORAGE ------
   useEffect(() => {
-    localStorage.setItem("token", token);
+    localStorage.setItem("adminToken", token);
   }, [token]);
 
   return (
-    <div className="bg-gray-100 min-h-screen">
-      <ToastContainer />
+    <div style={{ minHeight: '100vh', background: '#f8fafc' }}>
+      <ToastContainer position="top-right" autoClose={3000} />
       {token === "" ? (
-        <Login setToken={setToken} />
+        <Login
+          setToken={setToken}
+          adminEmail={ADMIN_EMAIL}
+          adminPassword={ADMIN_PASSWORD}
+        />
       ) : (
-        <>
-          {/* ---- LOG OUT ----- IN THE NAVBAR------- */}
-          <Navbar setToken={setToken} />
-          <hr />
-          <div className="flex w-full">
-            <Sidebar />
-            <div className="w-[70%] mx-auto ml-[max(5vw,25px)] my-8 text-gray-600 text-base">
+        <div style={{ display: 'flex', minHeight: '100vh' }}>
+          <Sidebar />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+            <Navbar setToken={setToken} />
+            <main style={{ flex: 1, padding: '28px 32px', overflowY: 'auto' }}>
               <Routes>
-                <Route path="/add" element={<Add token={token} />} />
-                <Route path="/list" element={<List token={token} />} />
-                <Route path="/orders" element={<Orders token={token} />} />
+                <Route path="/add"    element={<Add    products={products} setProducts={setProducts} />} />
+                <Route path="/list"   element={<List   products={products} setProducts={setProducts} />} />
+                <Route path="/orders" element={<Orders orders={orders}     setOrders={setOrders}     />} />
+                <Route path="/"       element={<List   products={products} setProducts={setProducts} />} />
               </Routes>
-            </div>
+            </main>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
