@@ -111,7 +111,8 @@ const Navbar = () => {
             <div className="relative" ref={profileRef}>
               <button
                 onClick={() => token ? setProfileOpen((v) => !v) : navigate('/login')}
-                className="p-2.5 rounded-xl transition-all text-white/50 hover:text-white hover:bg-white/10"
+                className="p-2.5 rounded-xl transition-all"
+                style={{ color: 'rgba(13,27,42,0.45)' }}
               >
                 <BsPerson className="w-[16px] h-[16px]" />
               </button>
@@ -139,7 +140,8 @@ const Navbar = () => {
             {/* Cart */}
             <Link
               to="/cart"
-              className="relative flex items-center justify-center p-2.5 rounded-xl transition-all text-white/50 hover:text-white hover:bg-white/10"
+              className="relative flex items-center justify-center p-2.5 rounded-xl transition-all"
+              style={{ color: 'rgba(13,27,42,0.45)' }}
             >
               <BsCart3 className="w-[16px] h-[16px]" />
               {cartCount > 0 && (
@@ -166,7 +168,8 @@ const Navbar = () => {
             {/* Hamburger */}
             <button
               onClick={() => setOpen(true)}
-              className="lg:hidden p-2.5 rounded-xl transition-all text-white/50 hover:text-white hover:bg-white/10 ml-1"
+              className="lg:hidden p-2.5 rounded-xl transition-all ml-1"
+              style={{ color: 'rgba(13,27,42,0.55)' }}
             >
               <HiOutlineMenuAlt3 className="w-5 h-5" />
             </button>
